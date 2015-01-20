@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby : 
 
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
+
 #cluster configuration
 CLUSTER_SIZE = 3
 START_CLUSTER_ID = 1
