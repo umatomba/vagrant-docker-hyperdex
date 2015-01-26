@@ -7,7 +7,7 @@ ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
 CLUSTER_SIZE = 3
 START_CLUSTER_ID = 1
 FROM_IP = "192.168.100.1"
-ALL_NODES_IN_CLUSTER = ["192.168.100.1","192.168.100.2","192.168.100.3"]
+ALL_NODES_IN_CLUSTER = ["192.168.100.1","192.168.100.2","192.168.100.3","192.168.100.4","192.168.100.5"]
 
 #spetial NW settings
 INTERFACE_PREFFIX = "eth"
@@ -36,9 +36,9 @@ Vagrant.configure("2") do |config|
                 d.name   = "coordinator#{in_cluster_position}"
                 d.create_args = ['-i', '-t', '--net=host']
                 if in_cluster_position == 1
-                    d.cmd = ['hyperdex', 'coordinator', '--foreground', "--listen=#{hostaddr}", "--data=/hyperdex/coord"]
+                    d.cmd = ['hyperdex', 'coordinator', '--foreground', "--listen=#{hostaddr}", "--data=/hyperdex/coord", '--log=/hyperdex/coord/logs']
                 else
-		    d.cmd    = ['hyperdex', 'coordinator', '--foreground', "--listen=#{hostaddr}" ,"--connect-string=#{ALL_NODES_IN_CLUSTER.join(':1982,')}", '--data=/hyperdex/coord']
+		    d.cmd    = ['hyperdex', 'coordinator', '--foreground', "--listen=#{hostaddr}" ,"--connect-string=#{ALL_NODES_IN_CLUSTER.join(':1982,')}", '--data=/hyperdex/coord', '--log=/hyperdex/coord/logs']
                 end
             end
         end
@@ -48,7 +48,7 @@ Vagrant.configure("2") do |config|
                 d.image = "umatomba/docker-hyperdex:1.6"
                 d.name   = "daemon#{in_cluster_position}"
                 d.create_args = ['-i', '-t', '--net=host']
-                d.cmd    = ['hyperdex', 'daemon', '--foreground', "--listen=#{hostaddr}", "--coordinator=#{hostaddr}", '--data=/hyperdex/daemon']
+                d.cmd    = ['hyperdex', 'daemon', '--foreground', "--listen=#{hostaddr}", "--coordinator=#{hostaddr}", '--data=/hyperdex/daemon', '--log=/hyperdex/daemon/logs']
             end
         end
     end
