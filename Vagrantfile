@@ -12,7 +12,7 @@ ALL_NODES_IN_CLUSTER = ["192.168.100.1","192.168.100.2","192.168.100.3","192.168
 #spetial NW settings
 INTERFACE_PREFFIX = "eth"
 START_INTERFACE_ID = 1
-HOSTNAME_PREF = 'h'
+HOSTNAME_PREF = ''
 
 def get_nodes (count, from_ip, hostname_pref)
     nodes = []
@@ -30,10 +30,10 @@ Vagrant.configure("2") do |config|
     cluster_nodes = get_nodes(CLUSTER_SIZE, FROM_IP, HOSTNAME_PREF)
 
     cluster_nodes.each do |in_cluster_position, hostname, hostaddr, interface|
-        config.vm.define "coordinator#{in_cluster_position}" do |coordinator|
+        config.vm.define "coordinator#{in_cluster_position}#{HOSTNAME_PREF}" do |coordinator|
             coordinator.vm.provider 'docker' do |d|
                 d.image = "umatomba/docker-hyperdex:1.6"
-                d.name   = "coordinator#{in_cluster_position}"
+                d.name   = "coordinator#{in_cluster_position}#{HOSTNAME_PREF}"
                 d.create_args = ['-i', '-t', '--net=host']
                 if in_cluster_position == 1
                     d.cmd = ['hyperdex', 'coordinator', '--foreground', "--listen=#{hostaddr}", "--data=/hyperdex/coord", '--log=/hyperdex/coord/logs']
@@ -43,10 +43,10 @@ Vagrant.configure("2") do |config|
             end
         end
 
-        config.vm.define "daemon#{in_cluster_position}" do |daemon|
+        config.vm.define "daemon#{in_cluster_position}#{HOSTNAME_PREF}" do |daemon|
             daemon.vm.provider 'docker' do |d|
                 d.image = "umatomba/docker-hyperdex:1.6"
-                d.name   = "daemon#{in_cluster_position}"
+                d.name   = "daemon#{in_cluster_position}#{HOSTNAME_PREF}"
                 d.create_args = ['-i', '-t', '--net=host']
                 d.cmd    = ['hyperdex', 'daemon', '--foreground', "--listen=#{hostaddr}", "--coordinator=#{hostaddr}", '--data=/hyperdex/daemon', '--log=/hyperdex/daemon/logs']
             end
